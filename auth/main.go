@@ -5,21 +5,55 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/bufbuild/protovalidate-go"
+	"github.com/gabehamasaki/orders/auth/db"
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var logger *zap.Logger
 
 type Server struct {
 	pb.UnimplementedAuthServiceServer
+	db     *db.Queries
+	logger *zap.Logger
 }
 
 func (s *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	return nil, fmt.Errorf("Testing...")
+	v, err := protovalidate.New()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := v.Validate(req); err != nil {
+		return nil, err
+	}
+
+	passBytes, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), 15)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := s.db.InserUser(ctx, db.InserUserParams{
+		Email:    pgtype.Text{String: req.GetEmail(), Valid: true},
+		Password: pgtype.Text{String: string(passBytes), Valid: true},
+		Name:     pgtype.Text{String: req.GetName(), Valid: true},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.RegisterResponse{
+		Token: "token",
+		Id:    id.String(),
+	}, nil
 }
 
 func main() {
@@ -46,14 +80,17 @@ func main() {
 		panic(err)
 	}
 
-	listener, err := net.Listen("tcp", "localhost:9001")
+	listener, err := net.Listen("tcp", "localhost:10001")
 	if err != nil {
 		panic(err)
 	}
 
-	logger.Info("Server starting in port :9001")
+	logger.Info("Server starting in port :10001")
 	server := grpc.NewServer(grpc.UnaryInterceptor(logRequest))
-	pb.RegisterAuthServiceServer(server, &Server{})
+	pb.RegisterAuthServiceServer(server, &Server{
+		db:     db.New(pool),
+		logger: logger,
+	})
 	if err := server.Serve(listener); err != nil {
 		panic(err)
 	}
@@ -64,6 +101,8 @@ func logRequest(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo
 	resp, err := handler(ctx, req)
 	if err != nil {
 		logger.Error(fmt.Sprintf("method %q failed: %s", info.FullMethod, err.Error()))
+		return resp, status.Errorf(codes.Internal, "%v", err)
 	}
+
 	return resp, err
 }
