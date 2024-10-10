@@ -8,7 +8,6 @@ import (
 	"github.com/bufbuild/protovalidate-go"
 	"github.com/gabehamasaki/orders/auth/db"
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -36,15 +35,20 @@ func (s *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.Reg
 		return nil, err
 	}
 
+	_, err = s.db.FindUserByEmail(ctx, req.GetEmail())
+	if err == nil {
+		return nil, fmt.Errorf("User alreadyExists")
+	}
+
 	passBytes, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), 15)
 	if err != nil {
 		return nil, err
 	}
 
-	id, err := s.db.InserUser(ctx, db.InserUserParams{
-		Email:    pgtype.Text{String: req.GetEmail(), Valid: true},
-		Password: pgtype.Text{String: string(passBytes), Valid: true},
-		Name:     pgtype.Text{String: req.GetName(), Valid: true},
+	id, err := s.db.InsertUser(ctx, db.InsertUserParams{
+		Email:    req.Email,
+		Password: string(passBytes),
+		Name:     req.GetName(),
 	})
 	if err != nil {
 		return nil, err
