@@ -60,7 +60,7 @@ message ListProductsResponse {
 }
 
 message ListOrderProductsRequest {
-    string order_id = 1;
+    string order_id = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 message ListOrderProductsResponse {
