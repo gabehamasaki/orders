@@ -17,3 +17,11 @@ type User struct {
 	CreatedAt pgtype.Timestamp
 	UpdatedAt pgtype.Timestamp
 }
+
+type UserToken struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Token     string
+	CreatedAt pgtype.Timestamp
+	ExpiresAt pgtype.Timestamp
+}
