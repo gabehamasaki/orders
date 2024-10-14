@@ -1,4 +1,4 @@
-.PHONY: run build migrate drop-db create-db fresh-db sqlc-gen
+.PHONY: run build migrate drop-db create-db fresh-db init-db sqlc-gen
 
 build:
 	@echo "Building services..."
@@ -21,6 +21,11 @@ sqlc-gen:
 	@echo "SQLC generated successfully!"
 
 # Database Commands Section
+init-db:
+	@echo "Starting database..."
+	@docker compose up -d postgres
+	@make migrate
+	@echo "Database started successfully!"
 migrate:
 	@echo "Migrating database..."
 	@tern migrate -c ./auth/db/migrations/tern.conf -m ./auth/db/migrations
