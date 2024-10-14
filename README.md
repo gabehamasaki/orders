@@ -1,26 +1,27 @@
-# Order System with Microservices
+# Order Management System with Microservices
 
 ## Overview
 
-Welcome to the Order Management System! This project implements a microservices architecture, featuring multiple services: `auth`, `products`, and `gateway`. Each service is responsible for specific functionalities within the system. This README provides detailed instructions on setting up, building, and managing these services.
+Welcome to the Order Management System! This project employs a microservices architecture with dedicated services for `auth`, `products`, and `gateway`. Each service handles specific functionalities, ensuring a modular and scalable system. This README offers comprehensive instructions for setting up, building, and managing these services.
 
 ## Architecture
 
-- **Auth Service**: Manages user authentication and authorization.
-- **Products Service**: Handles product listings and inventory management.
-- **Gateway Service**: Serves as the entry point for client requests, routing them to the appropriate services.
+- **Auth Service**: Responsible for user authentication and authorization.
+- **Products Service**: Manages product listings and inventory.
+- **Gateway Service**: Acts as the entry point for client requests, routing them to the appropriate services.
 
 ## Getting Started
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
+Ensure you have the following installed before you begin:
 
 - **Go**: Version 1.16 or later
 - **Docker**: Required for running the PostgreSQL database
-- **Node.js**: Necessary for the `concurrently` package
+- **Node.js**: Needed for the `concurrently` package
 - **SQLC**: For generating SQL code
 - **Tern**: For managing database migrations
+- **Buf**: For generating GRPC boilerplate code
 
 ### Installation Steps
 
@@ -36,7 +37,7 @@ Before you begin, ensure you have the following installed:
    ```
 
 3. **Initialize the Database**:
-   This step will start the PostgreSQL database using Docker and apply migrations:
+   This command starts the PostgreSQL database using Docker and applies migrations:
    ```bash
    make init-db
    ```
@@ -79,12 +80,11 @@ Before you begin, ensure you have the following installed:
 
 ## Makefile Targets
 
-The project includes a Makefile to streamline common tasks:
+The project includes a Makefile to streamline common tasks. Here are the available targets:
 
-### Available Targets
-
-- **init-db**: Run Docker Compose to create the database instance.
-- **build**: Compile the services and prepare the environment.
+- **buf-generate**: Regenerate GRPC boilerplate.
+- **init-db**: Start Docker Compose to create the database instance.
+- **build**: Compile the services and set up the environment.
 - **run**: Start the services concurrently.
 - **sqlc-gen**: Generate SQL code based on schema definitions.
 - **migrate**: Apply database migrations.
@@ -117,7 +117,7 @@ The project includes a Makefile to streamline common tasks:
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes. For significant modifications, please discuss them via an issue first.
+Contributions are welcome! Please fork the repository and submit a pull request with your changes. For significant modifications, discuss them via an issue first.
 
 ## License
 
@@ -125,4 +125,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Conclusion
 
-The Order Management System provides a scalable and efficient way to handle orders using microservices. Follow the setup instructions and utilize the Makefile for a smooth development experience. If you have any questions or encounter issues, feel free to open an issue in the repository. Happy coding!
+The Order Management System offers a scalable and efficient solution for managing orders through microservices. Follow the setup instructions and utilize the Makefile for a smooth development experience. If you have any questions or encounter issues, please open an issue in the repository. Happy coding!
