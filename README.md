@@ -26,8 +26,8 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the Repository**:
    ```bash
-   git clone <repository-url>
-   cd order-system
+   git clone https://github.com/gabehamasaki/orders.git
+   cd orders
    ```
 
 2. **Build the Services**:
