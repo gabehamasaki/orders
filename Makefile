@@ -9,7 +9,7 @@ build:
 
 run: build
 	@echo "Starting services concurrently..."
-	@concurrently --kill-others --names "auth,products,gate" \
+	@concurrently --kill-others --names "auth-service,products-service,gateway-service" \
 		"cd ./auth/build && ./auth" \
 		"cd ./products/build && ./products" \
 		"cd ./gateway/build && ./gateway"

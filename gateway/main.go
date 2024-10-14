@@ -42,7 +42,7 @@ func main() {
 	r.POST("/auth/register", handlers.Register)
 	r.POST("/auth/login", handlers.Login)
 
-	logger.Info("Server starting", zap.String("address", fmt.Sprintf("0.0.0.0:%s", cfg.PORT)))
+	logger.Info("Starting HTTP server", zap.String("address", fmt.Sprintf("0.0.0.0:%s", cfg.PORT)), zap.String("mode", cfg.GinMode))
 	r.Run(fmt.Sprintf("0.0.0.0:%s", cfg.PORT))
 }
 
