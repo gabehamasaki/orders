@@ -12,10 +12,10 @@ import (
 	"github.com/gabehamasaki/orders/auth/config"
 	"github.com/gabehamasaki/orders/auth/server"
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
+	log "github.com/gabehamasaki/orders/utils/logger"
+	"go.uber.org/zap"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,13 +43,10 @@ func run() error {
 	var err error
 
 	// Configure and build the logger
-	cfg := zap.NewDevelopmentConfig()
-	cfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	zapLogger, err := cfg.Build()
+	logger, err = log.NewLogger("auth")
 	if err != nil {
-		return fmt.Errorf("failed to initialize logger: %w", err)
+		return err
 	}
-	logger = zapLogger.Named("AuthService")
 	defer logger.Sync()
 
 	// Load configuration from environment variables

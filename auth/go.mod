@@ -5,6 +5,7 @@ go 1.22.3
 require (
 	github.com/bufbuild/protovalidate-go v0.7.2
 	github.com/gabehamasaki/orders/grpc v0.0.0
+	github.com/gabehamasaki/orders/utils v0.0.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.1
 	go.uber.org/zap v1.27.0
@@ -34,3 +35,5 @@ require (
 )
 
 replace github.com/gabehamasaki/orders/grpc v0.0.0 => ../grpc
+
+replace github.com/gabehamasaki/orders/utils v0.0.0 => ../utils

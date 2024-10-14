@@ -1,13 +1,18 @@
 package handlers
 
-import "github.com/gabehamasaki/orders/balancer/config"
+import (
+	"github.com/gabehamasaki/orders/gateway/clients"
+	"github.com/gabehamasaki/orders/gateway/config"
+)
 
 type Handler struct {
-	Cfg *config.Config
+	cfg    *config.Config
+	client *clients.Client
 }
 
-func NewHandler(cfg *config.Config) *Handler {
+func NewHandler(cfg *config.Config, client *clients.Client) *Handler {
 	return &Handler{
-		Cfg: cfg,
+		cfg:    cfg,
+		client: client,
 	}
 }
