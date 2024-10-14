@@ -8,14 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type RegisterRequest struct {
-	Name     string `json:"name"`
+type LoginRequest struct { // Fixed the struct definition
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func (h *Handler) Register(c *gin.Context) {
-	body := &RegisterRequest{}
+func (h *Handler) Login(c *gin.Context) {
+	body := &LoginRequest{}
 	if err := c.BindJSON(body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid request body",
@@ -23,16 +22,19 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	_, err := h.client.Register(c, &pb.RegisterRequest{
-		Name:     body.Name,
+	res, err := h.client.Login(c, &pb.LoginRequest{
 		Email:    body.Email,
-		Password: body.Password, // Fixed to use the correct password field
+		Password: body.Password,
 	})
 	if err != nil {
 		errArray := strings.Split(err.Error(), "desc = ")
 		switch errArray[len(errArray)-1] {
-		case "User already exists":
-			c.JSON(http.StatusConflict, gin.H{
+		case "User not found":
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": errArray[len(errArray)-1],
+			})
+		case "Invalid password":
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": errArray[len(errArray)-1],
 			})
 		default:
@@ -42,8 +44,7 @@ func (h *Handler) Register(c *gin.Context) {
 		}
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"message": "user registered",
+		"token": res.Token,
 	})
 }
