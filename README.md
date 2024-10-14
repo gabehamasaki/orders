@@ -16,7 +16,7 @@ Welcome to the Order Management System! This project employs a microservices arc
 
 Ensure you have the following installed before you begin:
 
-- **Go**: Version 1.16 or later
+- **Go**: Version 1.21 or later
 - **Docker**: Required for running the PostgreSQL database
 - **Node.js**: Needed for the `concurrently` package
 - **SQLC**: For generating SQL code
