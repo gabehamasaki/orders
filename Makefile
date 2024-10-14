@@ -1,4 +1,4 @@
-.PHONY: run build migrate drop-db create-db fresh-db init-db sqlc-gen
+.PHONY: run build migrate drop-db create-db fresh-db init-db sqlc-gen install-deps buf-lint buf-generate
 
 build:
 	@echo "Building services..."
@@ -19,6 +19,21 @@ sqlc-gen:
 	@cd ./auth && sqlc generate
 	@cd ./products && sqlc generate
 	@echo "SQLC generated successfully!"
+
+install-deps:
+	@echo "Installing dependencies..."
+	@cd ./auth && go mod tidy
+	@cd ./products && go mod tidy
+	@cd ./gateway && go mod tidy
+	@echo "Dependencies installed successfully!"
+buf-lint:
+	@echo "Linting proto files..."
+	@cd ./grpc && buf lint
+	@echo "Proto files linted successfully!"
+buf-generate: buf-lint
+	@echo "Generating proto files..."
+	@cd ./grpc && buf generate
+	@echo "Proto files generated successfully!"
 
 # Database Commands Section
 init-db:
