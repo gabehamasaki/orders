@@ -73,7 +73,7 @@ func run() error {
 		return fmt.Errorf("failed to listen: %w", err)
 	}
 
-	logger.Info("TCP Server starting...", zap.String("address", config.ServerAddress))
+	logger.Info("Starting TCP server", zap.String("address", config.ServerAddress))
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(logAndVerifyAnyRequest))
 
 	// Register Auth Service
