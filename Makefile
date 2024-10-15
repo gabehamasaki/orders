@@ -10,7 +10,7 @@ build:
 run: build
 	@clear
 	@echo "Starting services concurrently..."
-	@concurrently --kill-others --names "auth-service,products-service,gateway-service" \
+	@concurrently --kill-others --names "auth,product,gateway" \
 		"cd ./auth/build && ./auth" \
 		"cd ./products/build && ./products" \
 		"cd ./gateway/build && ./gateway"
@@ -44,8 +44,8 @@ init-db:
 	@echo "Database started successfully!"
 migrate:
 	@echo "Migrating database..."
-	@tern migrate -c ./auth/internal/db/migrations/tern.conf -m ./auth/db/migrations
-	@tern migrate -c ./products/internal/db/migrations/tern.conf -m ./products/db/migrations
+	@tern migrate -c ./auth/internal/db/migrations/tern.conf -m ./auth/internal/db/migrations
+	@tern migrate -c ./products/internal/db/migrations/tern.conf -m ./products/internal/db/migrations
 	@echo "Database migrated successfully!"
 drop-db:
 	@echo "Dropping database..."
