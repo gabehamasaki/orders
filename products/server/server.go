@@ -44,15 +44,16 @@ func (s *Server) CreateProduct(ctx context.Context, req *pb.CreateProductRequest
 func (s *Server) ListProducts(ctx context.Context, req *pb.ListProductsRequest) (*pb.ListProductsResponse, error) {
 	products, err := s.DB.GetProducts(ctx, db.GetProductsParams{
 		Limit:  req.GetPerPage(),
-		Offset: req.GetPage(),
+		Offset: req.GetPage() - 1,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	var pbProducts []*pb.ListProductsResponse_Product	
+	var pbProducts []*pb.ListProductsResponse_Product
 	var total int32
 	var totalPage int32
+	println(len(products))
 	for _, product := range products {
 		total = int32(product.Total)
 		totalPage = int32(product.TotalPages)
