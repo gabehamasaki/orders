@@ -8,6 +8,7 @@ import (
 	"github.com/gabehamasaki/orders/gateway/clients"
 	"github.com/gabehamasaki/orders/gateway/config"
 	"github.com/gabehamasaki/orders/gateway/handlers"
+	"github.com/gabehamasaki/orders/gateway/middleware"
 	"github.com/gabehamasaki/orders/utils/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -27,11 +28,15 @@ func main() {
 	}
 	defer logger.Sync()
 
+	client := clients.NewClient(logger, cfg)
+
 	r := gin.New()
+
 	r.Use(gin.Recovery())
 	r.Use(LoggerMiddleware(logger))
 
-	handlers := handlers.NewHandler(cfg, clients.NewClient(logger, cfg))
+	handlers := handlers.NewHandler(cfg, client)
+	middleware := middleware.NewMiddleware(client)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -41,6 +46,8 @@ func main() {
 
 	r.POST("/auth/register", handlers.Register)
 	r.POST("/auth/login", handlers.Login)
+	r.POST("/products", middleware.Authenticated(), handlers.CreateProduct)
+	r.GET("/products", middleware.Authenticated(), handlers.ListProducts)
 
 	logger.Info("Starting HTTP server", zap.String("address", fmt.Sprintf("0.0.0.0:%s", cfg.PORT)), zap.String("mode", cfg.GinMode))
 	r.Run(fmt.Sprintf("0.0.0.0:%s", cfg.PORT))
