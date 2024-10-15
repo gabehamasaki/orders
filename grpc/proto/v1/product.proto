@@ -4,8 +4,6 @@ package proto.v1;
 
 option go_package = "./pb";
 
-import "buf/validate/validate.proto";
-
 service ProductService {
     rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
     rpc GetProduct(GetProductRequest) returns (GetProductResponse);
@@ -16,10 +14,10 @@ service ProductService {
 }
 
 message CreateProductRequest {
-    string name = 1 [(buf.validate.field).string.min_len = 1];
-    string description = 2 [(buf.validate.field).string.min_len = 1];
-    float price = 3 [(buf.validate.field).float.gt = 0];
-    string image_url = 4 [(buf.validate.field).string.uri = true];
+    string name = 1;
+    string description = 2;
+    float price = 3;
+    string image_url = 4;
 }
 
 message CreateProductResponse {
@@ -39,8 +37,8 @@ message GetProductResponse {
 }
 
 message ListProductsRequest {
-    int32 page = 1 [(buf.validate.field).int32.gt = 0];
-    int32 per_page = 2 [(buf.validate.field).int32.gt = 0];
+    int32 page = 1;
+    int32 per_page = 2;
 }
 
 message ListProductsResponse {
@@ -58,7 +56,7 @@ message ListProductsResponse {
 }
 
 message ListOrderProductsRequest {
-    string order_id = 1 [(buf.validate.field).string.min_len = 1];
+    string order_id = 1;
 }
 
 message ListOrderProductsResponse {
@@ -76,10 +74,10 @@ message ListOrderProductsResponse {
 
 message UpdateProductRequest {
     string id = 1;
-    string name = 2 [(buf.validate.field).string.min_len = 1];
-    string description = 3 [(buf.validate.field).string.min_len = 1];
-    float price = 4 [(buf.validate.field).float.gt = 0];
-    string image_url = 5 [(buf.validate.field).string.uri = true];
+    string name = 2;
+    string description = 3;
+    float price = 4;
+    string image_url = 5;
 }
 
 message UpdateProductResponse {

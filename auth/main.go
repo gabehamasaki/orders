@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/bufbuild/protovalidate-go"
 	"github.com/gabehamasaki/orders/auth/config"
 	"github.com/gabehamasaki/orders/auth/server"
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
@@ -17,9 +16,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 // Global logger instance
@@ -85,25 +81,6 @@ func run() error {
 func logAndVerifyAnyRequest(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	start := time.Now()
 	logger.Info("Received request", zap.String("method", info.FullMethod))
-
-	// Initialize request validator
-	v, err := protovalidate.New()
-	if err != nil {
-		logger.Error("Failed to initialize validator", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "Failed to initialize validator: %v", err)
-	}
-
-	// Validate the request if it's a protobuf message
-	if protoReq, ok := req.(protoreflect.ProtoMessage); ok {
-		if err := v.Validate(protoReq); err != nil {
-			logger.Error("Invalid request",
-				zap.String("method", info.FullMethod),
-				zap.Error(err),
-			)
-			return nil, status.Errorf(codes.InvalidArgument, "Invalid request: %v", err)
-		}
-	}
-
 	// Call the handler
 	resp, err := handler(ctx, req)
 	duration := time.Since(start)
@@ -113,6 +90,7 @@ func logAndVerifyAnyRequest(ctx context.Context, req interface{}, info *grpc.Una
 		logger.Error("Request failed",
 			zap.String("method", info.FullMethod),
 			zap.Duration("duration", duration),
+
 			zap.Error(err),
 		)
 		return nil, err

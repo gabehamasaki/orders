@@ -5,7 +5,6 @@ go 1.21
 toolchain go1.22.3
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.35.1-20240920164238-5a7b106cbb87.1
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.35.1
 )

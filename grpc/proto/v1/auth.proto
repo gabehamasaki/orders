@@ -4,8 +4,6 @@ package proto.v1;
 
 option go_package = "./pb";
 
-import "buf/validate/validate.proto";
-
 service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc Register(RegisterRequest) returns (RegisterResponse);
@@ -13,8 +11,8 @@ service AuthService {
 }
 
 message LoginRequest {
-  string email = 1 [(buf.validate.field).string.min_len =1, (buf.validate.field).string.max_len = 255];
-  string password = 2 [(buf.validate.field).string.min_len =8, (buf.validate.field).string.max_len = 255];
+  string email = 1;
+  string password = 2;
 }
 
 message LoginResponse {
@@ -22,9 +20,9 @@ message LoginResponse {
 }
 
 message RegisterRequest {
-  string name = 1 [(buf.validate.field).string.min_len =1, (buf.validate.field).string.max_len = 255];
-  string email = 2 [(buf.validate.field).string.min_len =1, (buf.validate.field).string.max_len = 255];
-  string password = 3 [(buf.validate.field).string.min_len =8, (buf.validate.field).string.max_len = 255];
+  string name = 1;
+  string email = 2;
+  string password = 3;
 }
 
 message RegisterResponse {
@@ -33,7 +31,7 @@ message RegisterResponse {
 }
 
 message ValidateTokenRequest {
-  string token = 1 [(buf.validate.field).string.min_len =1];
+  string token = 1;
 }
 
 message ValidateTokenResponse {
