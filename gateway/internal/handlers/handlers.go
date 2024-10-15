@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/gabehamasaki/orders/gateway/clients"
-	"github.com/gabehamasaki/orders/gateway/config"
+	"github.com/gabehamasaki/orders/gateway/internal/clients"
+	"github.com/gabehamasaki/orders/gateway/internal/config"
 )
 
 type Handler struct {

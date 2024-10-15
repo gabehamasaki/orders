@@ -2,9 +2,9 @@
 
 build:
 	@echo "Building services..."
-	@cd ./auth && go build -o ./build/auth && cp ./.env ./build/.env
-	@cd ./products && go build -o ./build/products && cp ./.env ./build/.env
-	@cd ./gateway && go build -o ./build/gateway && cp ./.env ./build/.env
+	@cd ./auth cp ./.env ./build/.env && cd ./cmd/grpc && go build -o ./build/auth
+	@cd ./products cp ./.env ./build/.env && cd ./cmd/grpc && go build -o ./build/auth
+	@cd ./gateway cp ./.env ./build/.env && cd ./cmd/web && go build -o ./build/auth
 	@echo "Services built successfully!"
 
 run: build
@@ -44,8 +44,8 @@ init-db:
 	@echo "Database started successfully!"
 migrate:
 	@echo "Migrating database..."
-	@tern migrate -c ./auth/db/migrations/tern.conf -m ./auth/db/migrations
-	@tern migrate -c ./products/db/migrations/tern.conf -m ./products/db/migrations
+	@tern migrate -c ./auth/internal/db/migrations/tern.conf -m ./auth/db/migrations
+	@tern migrate -c ./products/internal/db/migrations/tern.conf -m ./products/db/migrations
 	@echo "Database migrated successfully!"
 drop-db:
 	@echo "Dropping database..."

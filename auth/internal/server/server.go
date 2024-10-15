@@ -4,7 +4,7 @@ package server
 import (
 	"context"
 
-	"github.com/gabehamasaki/orders/auth/db"
+	"github.com/gabehamasaki/orders/auth/internal/db"
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
 	"github.com/jackc/pgx/v5/pgxpool"
 

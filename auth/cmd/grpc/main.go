@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/gabehamasaki/orders/auth/config"
-	"github.com/gabehamasaki/orders/auth/server"
+	"github.com/gabehamasaki/orders/auth/internal/config"
+	"github.com/gabehamasaki/orders/auth/internal/server"
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
 	log "github.com/gabehamasaki/orders/utils/logger"
 	"go.uber.org/zap"

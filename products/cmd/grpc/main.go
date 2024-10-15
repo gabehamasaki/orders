@@ -9,8 +9,8 @@ import (
 	"time"
 
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
-	"github.com/gabehamasaki/orders/products/config"
-	"github.com/gabehamasaki/orders/products/server"
+	"github.com/gabehamasaki/orders/products/internal/config"
+	"github.com/gabehamasaki/orders/products/internal/server"
 	log "github.com/gabehamasaki/orders/utils/logger"
 	"go.uber.org/zap"
 

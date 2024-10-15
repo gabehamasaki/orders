@@ -5,7 +5,7 @@ import (
 	"context"
 
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
-	"github.com/gabehamasaki/orders/products/db"
+	"github.com/gabehamasaki/orders/products/internal/db"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 

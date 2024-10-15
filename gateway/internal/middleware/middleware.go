@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gabehamasaki/orders/gateway/clients"
+	"github.com/gabehamasaki/orders/gateway/internal/clients"
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
 	"github.com/gin-gonic/gin"
 )

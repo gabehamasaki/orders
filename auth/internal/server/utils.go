@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gabehamasaki/orders/auth/db"
+	"github.com/gabehamasaki/orders/auth/internal/db"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"

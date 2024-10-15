@@ -1,7 +1,7 @@
 package clients
 
 import (
-	"github.com/gabehamasaki/orders/gateway/config"
+	"github.com/gabehamasaki/orders/gateway/internal/config"
 	"go.uber.org/zap"
 )
 
