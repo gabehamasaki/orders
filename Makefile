@@ -8,6 +8,7 @@ build:
 	@echo "Services built successfully!"
 
 run: build
+	@clear
 	@echo "Starting services concurrently..."
 	@concurrently --kill-others --names "auth-service,products-service,gateway-service" \
 		"cd ./auth/build && ./auth" \

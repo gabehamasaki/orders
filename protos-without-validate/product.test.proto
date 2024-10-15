@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package proto.v1;
 
+option go_package = "./pb";
+
 service ProductService {
     rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
     rpc GetProduct(GetProductRequest) returns (GetProductResponse);
@@ -14,16 +16,12 @@ service ProductService {
 message CreateProductRequest {
     string name = 1;
     string description = 2;
-    int32 price = 3;
+    float price = 3;
     string image_url = 4;
 }
 
 message CreateProductResponse {
-    string id = 1;
-    string name = 2;
-    string description = 3;
-    int32 price = 4;
-    string image_url = 5;
+
 }
 
 message GetProductRequest {
@@ -34,7 +32,7 @@ message GetProductResponse {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 price = 4;
+    float price = 4;
     string image_url = 5;
 }
 
@@ -45,12 +43,14 @@ message ListProductsRequest {
 
 message ListProductsResponse {
     repeated Product products = 1;
+    int32 total = 2;
+    int32 total_pages = 3;
 
     message Product {
         string id = 1;
         string name = 2;
         string description = 3;
-        int32 price = 4;
+        float price = 4;
         string image_url = 5;
     }
 }
@@ -66,7 +66,7 @@ message ListOrderProductsResponse {
         string id = 1;
         string name = 2;
         string description = 3;
-        int32 price = 4;
+        float price = 4;
         string image_url = 5;
         int32 quantity = 6;
     }
@@ -76,7 +76,7 @@ message UpdateProductRequest {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 price = 4;
+    float price = 4;
     string image_url = 5;
 }
 
@@ -84,7 +84,7 @@ message UpdateProductResponse {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 price = 4;
+    float price = 4;
     string image_url = 5;
 }
 

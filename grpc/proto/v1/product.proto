@@ -18,16 +18,12 @@ service ProductService {
 message CreateProductRequest {
     string name = 1 [(buf.validate.field).string.min_len = 1];
     string description = 2 [(buf.validate.field).string.min_len = 1];
-    int32 price = 3 [(buf.validate.field).int32.gt = 0];
+    float price = 3 [(buf.validate.field).float.gt = 0];
     string image_url = 4 [(buf.validate.field).string.uri = true];
 }
 
 message CreateProductResponse {
-    string id = 1;
-    string name = 2;
-    string description = 3;
-    int32 price = 4;
-    string image_url = 5;
+
 }
 
 message GetProductRequest {
@@ -38,7 +34,7 @@ message GetProductResponse {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 price = 4;
+    float price = 4;
     string image_url = 5;
 }
 
@@ -49,12 +45,14 @@ message ListProductsRequest {
 
 message ListProductsResponse {
     repeated Product products = 1;
+    int32 total = 2;
+    int32 total_pages = 3;
 
     message Product {
         string id = 1;
         string name = 2;
         string description = 3;
-        int32 price = 4;
+        float price = 4;
         string image_url = 5;
     }
 }
@@ -70,7 +68,7 @@ message ListOrderProductsResponse {
         string id = 1;
         string name = 2;
         string description = 3;
-        int32 price = 4;
+        float price = 4;
         string image_url = 5;
         int32 quantity = 6;
     }
@@ -80,7 +78,7 @@ message UpdateProductRequest {
     string id = 1;
     string name = 2 [(buf.validate.field).string.min_len = 1];
     string description = 3 [(buf.validate.field).string.min_len = 1];
-    int32 price = 4 [(buf.validate.field).int32.gt = 0];
+    float price = 4 [(buf.validate.field).float.gt = 0];
     string image_url = 5 [(buf.validate.field).string.uri = true];
 }
 
@@ -88,7 +86,7 @@ message UpdateProductResponse {
     string id = 1;
     string name = 2;
     string description = 3;
-    int32 price = 4;
+    float price = 4;
     string image_url = 5;
 }
 

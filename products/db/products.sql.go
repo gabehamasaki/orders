@@ -31,6 +31,72 @@ func (q *Queries) GetProduct(ctx context.Context, id uuid.UUID) (Product, error)
 	return i, err
 }
 
+const getProducts = `-- name: GetProducts :many
+WITH product_count AS (
+    SELECT COUNT(*) AS total FROM products
+)
+SELECT p.id, p.name, p.description, p.price, p.image_url, p.created_at, p.updated_at,
+       pc.total,
+       CEIL(pc.total::float / $1::int) AS total_pages,
+       CASE
+           WHEN (pc.total - $2) < $1 THEN (pc.total - $2)
+           ELSE $1
+       END AS adjusted_limit
+FROM products p, product_count pc
+ORDER BY p.created_at DESC
+LIMIT $1
+OFFSET $2
+`
+
+type GetProductsParams struct {
+	Limit  int32
+	Offset int32
+}
+
+type GetProductsRow struct {
+	ID            uuid.UUID
+	Name          string
+	Description   pgtype.Text
+	Price         float32
+	ImageUrl      pgtype.Text
+	CreatedAt     pgtype.Timestamp
+	UpdatedAt     pgtype.Timestamp
+	Total         int64
+	TotalPages    float64
+	AdjustedLimit interface{}
+}
+
+func (q *Queries) GetProducts(ctx context.Context, arg GetProductsParams) ([]GetProductsRow, error) {
+	rows, err := q.db.Query(ctx, getProducts, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProductsRow
+	for rows.Next() {
+		var i GetProductsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Price,
+			&i.ImageUrl,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Total,
+			&i.TotalPages,
+			&i.AdjustedLimit,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertProduct = `-- name: InsertProduct :one
 INSERT INTO
     products (
@@ -45,7 +111,7 @@ VALUES ($1, $2, $3, $4) RETURNING id
 type InsertProductParams struct {
 	Name        string
 	Description pgtype.Text
-	Price       pgtype.Numeric
+	Price       float32
 	ImageUrl    pgtype.Text
 }
 

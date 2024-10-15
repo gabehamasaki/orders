@@ -13,7 +13,7 @@ type Product struct {
 	ID          uuid.UUID
 	Name        string
 	Description pgtype.Text
-	Price       pgtype.Numeric
+	Price       float32
 	ImageUrl    pgtype.Text
 	CreatedAt   pgtype.Timestamp
 	UpdatedAt   pgtype.Timestamp
