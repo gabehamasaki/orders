@@ -32,3 +32,15 @@ func (c *Client) ListProducts(ctx context.Context, request *pb.ListProductsReque
 
 	return client.ListProducts(ctx, request)
 }
+
+func (c *Client) GetProduct(ctx context.Context, id string) (*pb.GetProductResponse, error) {
+	conn, err := grpc.NewClient(c.cfg.ProductsServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		c.logger.Error("failed to dial auth service", zap.Error(err))
+		return nil, err
+	}
+	defer conn.Close()
+	client := pb.NewProductServiceClient(conn)
+
+	return client.GetProduct(ctx, &pb.GetProductRequest{Id: id})
+}

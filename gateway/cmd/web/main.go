@@ -48,6 +48,7 @@ func main() {
 	r.POST("/auth/login", handlers.Login)
 	r.POST("/products", middleware.Authenticated(), handlers.CreateProduct)
 	r.GET("/products", middleware.Authenticated(), handlers.ListProducts)
+	r.GET("/products/:id", middleware.Authenticated(), handlers.GetProduct)
 
 	logger.Info("Starting HTTP server", zap.String("address", fmt.Sprintf("0.0.0.0:%s", cfg.PORT)), zap.String("mode", cfg.GinMode))
 	r.Run(fmt.Sprintf("0.0.0.0:%s", cfg.PORT))

@@ -3,9 +3,11 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	pb "github.com/gabehamasaki/orders/grpc/pb/proto/v1"
 	"github.com/gabehamasaki/orders/products/internal/db"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -66,4 +68,25 @@ func (s *Server) ListProducts(ctx context.Context, req *pb.ListProductsRequest) 
 	}
 
 	return &pb.ListProductsResponse{Products: pbProducts, Total: total, TotalPages: totalPage}, nil
+}
+
+func (s *Server) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.GetProductResponse, error) {
+	ID, err := uuid.Parse(req.GetId())
+	if err != nil {
+		return nil, fmt.Errorf("invalid UUID: %w", err)
+	}
+
+	product, err := s.DB.GetProduct(ctx, ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get product: %w", err)
+	}
+
+	return &pb.GetProductResponse{
+		Id:          product.ID.String(),
+		Name:        product.Name,
+		Description: product.Description.String,
+		Price:       product.Price,
+		ImageUrl:    product.ImageUrl.String,
+	}, nil
+
 }

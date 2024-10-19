@@ -1,10 +1,14 @@
 .PHONY: run build migrate drop-db create-db fresh-db init-db sqlc-gen install-deps buf-lint buf-generate
 
 build:
+	@echo "Cleaning up build directories..."
+	@rm -rf ./auth/build && mkdir -p ./auth/build
+	@rm -rf ./products/build && mkdir -p ./products/build
+	@rm -rf ./gateway/build && mkdir -p ./gateway/build
 	@echo "Building services..."
-	@cd ./auth cp ./.env ./build/.env && cd ./cmd/grpc && go build -o ./build/auth
-	@cd ./products cp ./.env ./build/.env && cd ./cmd/grpc && go build -o ./build/auth
-	@cd ./gateway cp ./.env ./build/.env && cd ./cmd/web && go build -o ./build/auth
+	@cd ./auth && cp ./.env ./build/.env && go build -o ./build/auth ./cmd/grpc
+	@cd ./products && cp ./.env ./build/.env && go build -o ./build/products ./cmd/grpc
+	@cd ./gateway && cp ./.env ./build/.env && go build -o ./build/gateway ./cmd/web
 	@echo "Services built successfully!"
 
 run: build
