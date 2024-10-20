@@ -64,12 +64,13 @@ func run() error {
 	}
 
 	// Initialize gRPC server
-	listener, err := net.Listen("tcp", config.ServerAddress)
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", config.PORT))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
 	}
+	defer listener.Close()
 
-	logger.Info("Starting TCP server", zap.String("address", config.ServerAddress))
+	logger.Info("Starting TCP server", zap.String("address", fmt.Sprintf(":%s", config.PORT)))
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(logAndVerifyAnyRequest))
 
 	// Register Auth Service

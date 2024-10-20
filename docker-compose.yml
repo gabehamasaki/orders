@@ -1,5 +1,52 @@
-version: "3.8"
 services:
+  gateway:
+    build:
+      context: .
+      dockerfile: ./gateway/Dockerfile
+    ports:
+      - "4321:80"
+    environment:
+      GIN_MODE: release
+      auth_service_addr: auth:80  # Use service name instead of localhost
+      products_service_addr: products:80  # Use service name instead of localhost
+    restart: always
+    networks:
+      - public-network
+      - private-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+  auth:
+    build:
+      context: .
+      dockerfile: ./auth/Dockerfile
+    ports:
+      - "10001:80"
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/orders  # Use service name instead of localhost
+      JWT_SECRET_KEY: ef17c82048890c4c8360456a94bf698ad8166584e99b5e06be6297829bdb750f
+    restart: always
+    networks:
+      - private-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  products:
+    build:
+      context: .
+      dockerfile: ./products/Dockerfile
+    ports:
+      - "10002:80"
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/orders  # Use service name instead of localhost
+    restart: always
+    networks:
+      - private-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:15.3-alpine
     container_name: postgres
@@ -9,21 +56,21 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: orders
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
-  minio:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_storage:/data
-    restart: unless-stopped
-    environment:
-      MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: password
-    command: server --console-address ":9001" /data
+    networks:
+      - public-network
+      - private-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-volumes:
-  minio_storage: {}
+networks:
+  public-network:
+    driver: bridge
+  private-network:
+    driver: bridge
+    internal: true

@@ -1,23 +1,18 @@
 .PHONY: run build migrate drop-db create-db fresh-db init-db sqlc-gen install-deps buf-lint buf-generate
 
 build:
-	@echo "Cleaning up build directories..."
-	@rm -rf ./auth/build && mkdir -p ./auth/build
-	@rm -rf ./products/build && mkdir -p ./products/build
-	@rm -rf ./gateway/build && mkdir -p ./gateway/build
 	@echo "Building services..."
-	@cd ./auth && cp ./.env ./build/.env && go build -o ./build/auth ./cmd/grpc
-	@cd ./products && cp ./.env ./build/.env && go build -o ./build/products ./cmd/grpc
-	@cd ./gateway && cp ./.env ./build/.env && go build -o ./build/gateway ./cmd/web
+	@docker compose build > /dev/null
 	@echo "Services built successfully!"
 
-run: build
-	@clear
-	@echo "Starting services concurrently..."
-	@concurrently --kill-others --names "auth,product,gateway" \
-		"cd ./auth/build && ./auth" \
-		"cd ./products/build && ./products" \
-		"cd ./gateway/build && ./gateway"
+clean:
+	@echo "Cleaning up docker containers..."
+	@docker compose down -v
+	@echo "Docker containers cleaned up successfully!"
+
+run: build migrate
+	@echo "Starting services..."
+	@docker compose up auth products gateway
 
 sqlc-gen:
 	@echo "Generating SQLC..."
@@ -41,12 +36,11 @@ buf-generate: buf-lint
 	@echo "Proto files generated successfully!"
 
 # Database Commands Section
-init-db:
+run-db:
 	@echo "Starting database..."
-	@docker compose up -d postgres
-	@make migrate
+	@docker compose up -d postgres > /dev/null
 	@echo "Database started successfully!"
-migrate:
+migrate: run-db
 	@echo "Migrating database..."
 	@tern migrate -c ./auth/internal/db/migrations/tern.conf -m ./auth/internal/db/migrations
 	@tern migrate -c ./products/internal/db/migrations/tern.conf -m ./products/internal/db/migrations

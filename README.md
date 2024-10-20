@@ -2,23 +2,24 @@
 
 ## Overview
 
-Welcome to the Order Management System! This project employs a microservices architecture with dedicated services for `auth`, `products`, and `gateway`. Each service handles specific functionalities, ensuring a modular and scalable system. This README offers comprehensive instructions for setting up, building, and managing these services.
+Welcome to the **Order Management System**! This project utilizes a microservices architecture, featuring dedicated services for **Authentication**, **Product Management**, and a **Gateway**. Each service is designed to handle specific functionalities, ensuring a modular, scalable, and maintainable system. This README provides detailed instructions for setting up, building, and managing these services effectively.
 
 ## Architecture
 
-- **Auth Service**: Responsible for user authentication and authorization.
-- **Products Service**: Manages product listings and inventory.
-- **Gateway Service**: Acts as the entry point for client requests, routing them to the appropriate services.
+The system is composed of the following services:
+
+- **Auth Service**: Handles user authentication and authorization processes.
+- **Products Service**: Manages product listings, inventory, and related operations.
+- **Gateway Service**: Serves as the entry point for client requests, routing them to the appropriate services seamlessly.
 
 ## Getting Started
 
 ### Prerequisites
 
-Ensure you have the following installed before you begin:
+Before you begin, ensure you have the following software installed:
 
 - **Go**: Version 1.21 or later
-- **Docker**: Required for running the PostgreSQL database
-- **Node.js**: Needed for the `concurrently` package
+- **Docker**: Required for running the services
 - **SQLC**: For generating SQL code
 - **Tern**: For managing database migrations
 - **Buf**: For generating GRPC boilerplate code
@@ -31,15 +32,9 @@ Ensure you have the following installed before you begin:
    cd orders
    ```
 
-2. **Build the Services**:
+2. **Build the Services and Initialize the Database**:
    ```bash
-   make build
-   ```
-
-3. **Initialize the Database**:
-   This command starts the PostgreSQL database using Docker and applies migrations:
-   ```bash
-   make init-db
+   make run
    ```
 
 ## API Endpoints
@@ -71,6 +66,35 @@ Ensure you have the following installed before you begin:
     ```
   - **Description**: Authenticates a user and returns a token.
 
+### Products Service
+
+- **Create Product**
+  - **Endpoint**: `/products`
+  - **Method**: `POST`
+  - **Request Body**:
+    ```json
+    {
+      "name": "string",
+      "description": "string",
+      "price": 0.0,
+      "image_url": "string"
+    }
+    ```
+  - **Description**: Creates a new product.
+
+- **List Products**
+  - **Endpoint**: `/products`
+  - **Method**: `GET`
+  - **Query Parameters**:
+    - `page`: Page number for pagination (default: 1)
+    - `per_page`: Number of products per page (default: 15)
+  - **Description**: Retrieves a list of products.
+
+- **Get Product**
+  - **Endpoint**: `/products/:id`
+  - **Method**: `GET`
+  - **Description**: Retrieves a specific product by its ID.
+
 ### Health Check
 
 - **Ping**
@@ -84,8 +108,8 @@ The project includes a Makefile to streamline common tasks. Here are the availab
 
 - **buf-generate**: Regenerate GRPC boilerplate.
 - **init-db**: Start Docker Compose to create the database instance.
-- **build**: Compile the services and set up the environment.
-- **run**: Start the services concurrently.
+- **build**: Compile the services.
+- **run**: Start the services using Docker.
 - **sqlc-gen**: Generate SQL code based on schema definitions.
 - **migrate**: Apply database migrations.
 - **drop-db**: Drop the existing database.
@@ -117,7 +141,7 @@ The project includes a Makefile to streamline common tasks. Here are the availab
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes. For significant modifications, discuss them via an issue first.
+We welcome contributions! Please fork the repository and submit a pull request with your changes. For significant modifications, we encourage discussing them via an issue first.
 
 ## License
 
@@ -125,4 +149,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Conclusion
 
-The Order Management System offers a scalable and efficient solution for managing orders through microservices. Follow the setup instructions and utilize the Makefile for a smooth development experience. If you have any questions or encounter issues, please open an issue in the repository. Happy coding!
+The Order Management System provides a scalable and efficient solution for managing orders through microservices. Follow the setup instructions and utilize the Makefile for a smooth development experience. If you have any questions or encounter issues, please open an issue in the repository. Happy coding!

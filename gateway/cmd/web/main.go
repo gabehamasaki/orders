@@ -50,8 +50,8 @@ func main() {
 	r.GET("/products", middleware.Authenticated(), handlers.ListProducts)
 	r.GET("/products/:id", middleware.Authenticated(), handlers.GetProduct)
 
-	logger.Info("Starting HTTP server", zap.String("address", fmt.Sprintf("0.0.0.0:%s", cfg.PORT)), zap.String("mode", cfg.GinMode))
-	r.Run(fmt.Sprintf("0.0.0.0:%s", cfg.PORT))
+	logger.Info("Starting HTTP server", zap.String("address", fmt.Sprintf(":%s", cfg.PORT)))
+	r.Run(fmt.Sprintf(":%s", cfg.PORT))
 }
 
 // LoggerMiddleware logs the request and response of the API
