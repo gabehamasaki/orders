@@ -4,12 +4,13 @@ INSERT INTO
         name,
         description,
         price,
-        image_url
+        image_url,
+        client_id
     )
-VALUES ($1, $2, $3, $4) RETURNING id;
+VALUES ($1, $2, $3, $4, $5) RETURNING id;
 
 -- name: GetProduct :one
-SELECT * FROM products WHERE id = $1;
+SELECT * FROM products WHERE id = $1 AND client_id = $2;
 
 -- name: GetProducts :many
 WITH product_count AS (
@@ -19,6 +20,7 @@ SELECT p.id, p.name, p.description, p.price, p.image_url, p.created_at, p.update
        pc.total,
        CEIL(pc.total::float / $1::int) AS total_pages
 FROM products p, product_count pc
+WHERE p.client_id = $3
 ORDER BY p.created_at
 LIMIT $1
 OFFSET $2;

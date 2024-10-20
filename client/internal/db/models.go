@@ -9,20 +9,11 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type User struct {
+type Client struct {
 	ID        uuid.UUID
 	Name      string
-	Email     string
-	Password  string
-	ClientID  pgtype.UUID
+	BrandName string
+	LogoUrl   pgtype.Text
 	CreatedAt pgtype.Timestamp
 	UpdatedAt pgtype.Timestamp
-}
-
-type UserToken struct {
-	ID        uuid.UUID
-	UserID    uuid.UUID
-	Token     string
-	CreatedAt pgtype.Timestamp
-	ExpiresAt pgtype.Timestamp
 }

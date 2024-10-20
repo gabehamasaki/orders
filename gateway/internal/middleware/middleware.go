@@ -44,6 +44,7 @@ func (m *Middleware) Authenticated() gin.HandlerFunc {
 
 		// Set the user ID in the context
 		c.Set("userID", res.Id)
+		c.Set("clientID", res.ClientId)
 
 		// Continue to the next middleware
 		c.Next()

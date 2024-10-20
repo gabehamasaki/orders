@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gabehamasaki/orders/auth/internal/db"
@@ -12,7 +13,7 @@ import (
 )
 
 // createToken generates a new JWT token for the given user ID or returns an existing valid token
-func (s *Server) createToken(userID string) (string, error) {
+func (s *Server) createToken(userID string, clientID string) (string, error) {
 	// Set token expiration time to 24 hours from now
 	expirationTime := time.Now().Add(time.Hour * 24)
 	ext := expirationTime.Unix()
@@ -37,11 +38,11 @@ func (s *Server) createToken(userID string) (string, error) {
 
 	// Create a new token with claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userID,       // Subject (user ID)
-		"iss": "orders-app", // Issuer
-		"aud": "user",       // Audience
-		"exp": ext,          // Expiration time
-		"iat": iat,          // Issued at
+		"sub": fmt.Sprintf("%s|%s", userID, clientID), // Subject (user ID)
+		"iss": "orders-app",                           // Issuer
+		"aud": "user",                                 // Audience
+		"exp": ext,                                    // Expiration time
+		"iat": iat,                                    // Issued at
 	})
 
 	// Sign the token with the server's secret key
@@ -66,9 +67,16 @@ func (s *Server) createToken(userID string) (string, error) {
 	return tokenString, nil
 }
 
+type VerifyTokenResponse struct {
+	UserID   string
+	ClientID string
+	Valid    bool
+}
+
 // verifyToken validates the given JWT token and returns the associated user ID
-func (s *Server) verifyToken(ctx context.Context, tokenString string) (string, error) {
+func (s *Server) verifyToken(ctx context.Context, tokenString string) (*VerifyTokenResponse, error) {
 	var userID uuid.UUID
+	var clientID uuid.UUID
 
 	// Parse and validate the token
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
@@ -83,14 +91,28 @@ func (s *Server) verifyToken(ctx context.Context, tokenString string) (string, e
 			return nil, fmt.Errorf("failed to get subject from token: %w", err)
 		}
 
+		IDS := strings.Split(sub, "|")
+
 		// Parse the user ID
-		userID, err = uuid.Parse(sub)
+		userID, err = uuid.Parse(IDS[0])
 		if err != nil {
 			return nil, fmt.Errorf("invalid user ID in token: %w", err)
 		}
 
+		// Parse the client ID
+		clientID, err = uuid.Parse(IDS[1])
+		if err != nil {
+			return nil, fmt.Errorf("invalid client ID in token: %w", err)
+		}
+
 		// Verify that the user exists in the database
-		_, err = s.DB.FindUserById(ctx, userID)
+		_, err = s.DB.FindUserById(ctx, db.FindUserByIdParams{
+			ID: userID,
+			ClientID: pgtype.UUID{
+				Bytes: clientID,
+				Valid: IDS[1] != "",
+			},
+		})
 		if err != nil {
 			return nil, fmt.Errorf("user not found in database: %w", err)
 		}
@@ -109,14 +131,17 @@ func (s *Server) verifyToken(ctx context.Context, tokenString string) (string, e
 
 	// Handle parsing errors
 	if err != nil {
-		return "", fmt.Errorf("failed to parse token: %w", err)
+		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
 	// Check if the token is valid
 	if !token.Valid {
-		return "", fmt.Errorf("invalid token")
+		return nil, fmt.Errorf("invalid token")
 	}
 
 	// Return the validated user ID
-	return userID.String(), nil
+	return &VerifyTokenResponse{
+		UserID:   userID.String(),
+		ClientID: clientID.String(),
+	}, nil
 }

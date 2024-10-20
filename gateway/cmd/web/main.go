@@ -31,7 +31,6 @@ func main() {
 	client := clients.NewClient(logger, cfg)
 
 	r := gin.New()
-
 	r.Use(gin.Recovery())
 	r.Use(LoggerMiddleware(logger))
 
@@ -44,11 +43,21 @@ func main() {
 		})
 	})
 
-	r.POST("/auth/register", handlers.Register)
-	r.POST("/auth/login", handlers.Login)
-	r.POST("/products", middleware.Authenticated(), handlers.CreateProduct)
-	r.GET("/products", middleware.Authenticated(), handlers.ListProducts)
-	r.GET("/products/:id", middleware.Authenticated(), handlers.GetProduct)
+	api := r.Group("/api")
+	{
+		api.POST("/auth/login", handlers.Login)
+		private := r.Group("/api", middleware.Authenticated())
+		{
+			private.POST("/products", handlers.CreateProduct)
+			private.GET("/products", handlers.ListProducts)
+			private.GET("/products/:id", handlers.GetProduct)
+		}
+	}
+
+	routes := r.Routes()
+	for _, route := range routes {
+		logger.Info("Registered route", zap.String("method", route.Method), zap.String("path", route.Path))
+	}
 
 	logger.Info("Starting HTTP server", zap.String("address", fmt.Sprintf(":%s", cfg.PORT)))
 	r.Run(fmt.Sprintf(":%s", cfg.PORT))

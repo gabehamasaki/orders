@@ -15,6 +15,7 @@ type Product struct {
 	Description pgtype.Text
 	Price       float32
 	ImageUrl    pgtype.Text
+	ClientID    pgtype.UUID
 	CreatedAt   pgtype.Timestamp
 	UpdatedAt   pgtype.Timestamp
 }

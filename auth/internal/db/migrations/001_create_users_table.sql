@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
     "name" varchar(255) NOT NULL,
     "email" varchar(255) UNIQUE NOT NULL,
     "password" varchar NOT NULL,
+    "client_id" uuid REFERENCES clients (id) ON DELETE CASCADE,
     "created_at" TIMESTAMP NOT NULL DEFAULT now(),
     "updated_at" TIMESTAMP NOT NULL DEFAULT now()
 );

@@ -13,11 +13,16 @@ import (
 )
 
 const getProduct = `-- name: GetProduct :one
-SELECT id, name, description, price, image_url, created_at, updated_at FROM products WHERE id = $1
+SELECT id, name, description, price, image_url, client_id, created_at, updated_at FROM products WHERE id = $1 AND client_id = $2
 `
 
-func (q *Queries) GetProduct(ctx context.Context, id uuid.UUID) (Product, error) {
-	row := q.db.QueryRow(ctx, getProduct, id)
+type GetProductParams struct {
+	ID       uuid.UUID
+	ClientID pgtype.UUID
+}
+
+func (q *Queries) GetProduct(ctx context.Context, arg GetProductParams) (Product, error) {
+	row := q.db.QueryRow(ctx, getProduct, arg.ID, arg.ClientID)
 	var i Product
 	err := row.Scan(
 		&i.ID,
@@ -25,6 +30,7 @@ func (q *Queries) GetProduct(ctx context.Context, id uuid.UUID) (Product, error)
 		&i.Description,
 		&i.Price,
 		&i.ImageUrl,
+		&i.ClientID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -39,14 +45,16 @@ SELECT p.id, p.name, p.description, p.price, p.image_url, p.created_at, p.update
        pc.total,
        CEIL(pc.total::float / $1::int) AS total_pages
 FROM products p, product_count pc
+WHERE p.client_id = $3
 ORDER BY p.created_at
 LIMIT $1
 OFFSET $2
 `
 
 type GetProductsParams struct {
-	Limit  int32
-	Offset int32
+	Limit    int32
+	Offset   int32
+	ClientID pgtype.UUID
 }
 
 type GetProductsRow struct {
@@ -62,7 +70,7 @@ type GetProductsRow struct {
 }
 
 func (q *Queries) GetProducts(ctx context.Context, arg GetProductsParams) ([]GetProductsRow, error) {
-	rows, err := q.db.Query(ctx, getProducts, arg.Limit, arg.Offset)
+	rows, err := q.db.Query(ctx, getProducts, arg.Limit, arg.Offset, arg.ClientID)
 	if err != nil {
 		return nil, err
 	}
@@ -97,9 +105,10 @@ INSERT INTO
         name,
         description,
         price,
-        image_url
+        image_url,
+        client_id
     )
-VALUES ($1, $2, $3, $4) RETURNING id
+VALUES ($1, $2, $3, $4, $5) RETURNING id
 `
 
 type InsertProductParams struct {
@@ -107,6 +116,7 @@ type InsertProductParams struct {
 	Description pgtype.Text
 	Price       float32
 	ImageUrl    pgtype.Text
+	ClientID    pgtype.UUID
 }
 
 func (q *Queries) InsertProduct(ctx context.Context, arg InsertProductParams) (uuid.UUID, error) {
@@ -115,6 +125,7 @@ func (q *Queries) InsertProduct(ctx context.Context, arg InsertProductParams) (u
 		arg.Description,
 		arg.Price,
 		arg.ImageUrl,
+		arg.ClientID,
 	)
 	var id uuid.UUID
 	err := row.Scan(&id)

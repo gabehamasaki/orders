@@ -9,10 +9,11 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const findUserByEmail = `-- name: FindUserByEmail :one
-SELECT id, name, email, password, created_at, updated_at FROM users WHERE email = $1
+SELECT id, name, email, password, client_id, created_at, updated_at FROM users WHERE email = $1
 `
 
 func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, error) {
@@ -23,6 +24,7 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.ClientID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -30,17 +32,23 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 }
 
 const findUserById = `-- name: FindUserById :one
-SELECT id, name, email, password, created_at, updated_at FROM users WHERE id = $1
+SELECT id, name, email, password, client_id, created_at, updated_at FROM users WHERE id = $1 AND client_id = $2
 `
 
-func (q *Queries) FindUserById(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, findUserById, id)
+type FindUserByIdParams struct {
+	ID       uuid.UUID
+	ClientID pgtype.UUID
+}
+
+func (q *Queries) FindUserById(ctx context.Context, arg FindUserByIdParams) (User, error) {
+	row := q.db.QueryRow(ctx, findUserById, arg.ID, arg.ClientID)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.ClientID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -48,10 +56,15 @@ func (q *Queries) FindUserById(ctx context.Context, id uuid.UUID) (User, error) 
 }
 
 const insertUser = `-- name: InsertUser :one
-INSERT INTO users 
-  ("name", "email", "password", "created_at", "updated_at") VALUES
-  ( $1, $2, $3, now(), now() )
-RETURNING "id"
+INSERT INTO
+    users (
+        "name",
+        "email",
+        "password",
+        "created_at",
+        "updated_at"
+    )
+VALUES ($1, $2, $3, now(), now()) RETURNING "id"
 `
 
 type InsertUserParams struct {

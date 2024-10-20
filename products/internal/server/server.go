@@ -76,7 +76,13 @@ func (s *Server) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb
 		return nil, fmt.Errorf("invalid UUID: %w", err)
 	}
 
-	product, err := s.DB.GetProduct(ctx, ID)
+	product, err := s.DB.GetProduct(ctx, db.GetProductParams{
+		ID: ID,
+		ClientID: pgtype.UUID{
+			Bytes: uuid.Must(uuid.Parse(req.ClientId)),
+			Valid: req.ClientId != "",
+		},
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get product: %w", err)
 	}

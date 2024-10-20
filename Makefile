@@ -12,16 +12,18 @@ clean:
 
 run: build migrate
 	@echo "Starting services..."
-	@docker compose up auth products gateway
+	@docker compose up client auth products gateway
 
 sqlc-gen:
 	@echo "Generating SQLC..."
+	@cd ./client && sqlc generate
 	@cd ./auth && sqlc generate
 	@cd ./products && sqlc generate
 	@echo "SQLC generated successfully!"
 
 install-deps:
 	@echo "Installing dependencies..."
+	@cd ./client && go mod download
 	@cd ./auth && go mod tidy
 	@cd ./products && go mod tidy
 	@cd ./gateway && go mod tidy
@@ -42,6 +44,7 @@ run-db:
 	@echo "Database started successfully!"
 migrate: run-db
 	@echo "Migrating database..."
+	@tern migrate -c ./client/internal/db/migrations/tern.conf -m ./client/internal/db/migrations
 	@tern migrate -c ./auth/internal/db/migrations/tern.conf -m ./auth/internal/db/migrations
 	@tern migrate -c ./products/internal/db/migrations/tern.conf -m ./products/internal/db/migrations
 	@echo "Database migrated successfully!"

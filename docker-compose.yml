@@ -4,14 +4,27 @@ services:
       context: .
       dockerfile: ./gateway/Dockerfile
     ports:
-      - "4321:80"
+      - "${GATEWAY_PORT}:80"
     environment:
       GIN_MODE: release
-      auth_service_addr: auth:80  # Use service name instead of localhost
-      products_service_addr: products:80  # Use service name instead of localhost
+      auth_service_addr: auth:80
+      products_service_addr: products:80
+      client_service_addr: client:80
     restart: always
     networks:
       - public-network
+      - private-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    restart: always
+    networks:
       - private-network
     depends_on:
       postgres:
@@ -20,11 +33,9 @@ services:
     build:
       context: .
       dockerfile: ./auth/Dockerfile
-    ports:
-      - "10001:80"
     environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/orders  # Use service name instead of localhost
-      JWT_SECRET_KEY: ef17c82048890c4c8360456a94bf698ad8166584e99b5e06be6297829bdb750f
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     restart: always
     networks:
       - private-network
@@ -36,17 +47,14 @@ services:
     build:
       context: .
       dockerfile: ./products/Dockerfile
-    ports:
-      - "10002:80"
     environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/orders  # Use service name instead of localhost
+      DATABASE_URL: ${DATABASE_URL}
     restart: always
     networks:
       - private-network
     depends_on:
       postgres:
         condition: service_healthy
-
   postgres:
     image: postgres:15.3-alpine
     container_name: postgres

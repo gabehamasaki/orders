@@ -18,6 +18,7 @@ message CreateProductRequest {
     string description = 2;
     float price = 3;
     string image_url = 4;
+    string client_id = 5;
 }
 
 message CreateProductResponse {
@@ -26,6 +27,7 @@ message CreateProductResponse {
 
 message GetProductRequest {
     string id = 1;
+    string client_id = 2;
 }
 
 message GetProductResponse {
@@ -39,12 +41,14 @@ message GetProductResponse {
 message ListProductsRequest {
     int32 page = 1;
     int32 per_page = 2;
+    string client_id = 3;
 }
 
 message ListProductsResponse {
     repeated Product products = 1;
     int32 total = 2;
     int32 total_pages = 3;
+    string client_id = 4;
 
     message Product {
         string id = 1;
@@ -78,6 +82,7 @@ message UpdateProductRequest {
     string description = 3;
     float price = 4;
     string image_url = 5;
+    string client_id = 6;
 }
 
 message UpdateProductResponse {
@@ -90,6 +95,7 @@ message UpdateProductResponse {
 
 message DeleteProductRequest {
     string id = 1;
+    string client_id = 2;
 }
 
 message DeleteProductResponse {
